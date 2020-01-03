@@ -3,18 +3,20 @@ package com.perfiltic.ecommerce.infrastructure.repositories;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import com.perfiltic.ecommerce.domain.model.Category;
 import com.perfiltic.ecommerce.domain.repositories.CategoryRepository;
 import com.perfiltic.ecommerce.infrastructure.daos.CategoryRepositoryDao;
 
+@Repository
 public class CategoryRepositoryImp implements CategoryRepository {
 
 	@Autowired
 	private CategoryRepositoryDao categoryRepositoryDao;
 
 	@Override
-	public Page<Category> getCategoriesByCategory(Long idCategory, Pageable pageable) {
+	public Page<Category> getCategoriesBySuperCategory(Long idCategory, Pageable pageable) {
 		return categoryRepositoryDao.findBySuperCategory(idCategory, pageable);
 	}
 

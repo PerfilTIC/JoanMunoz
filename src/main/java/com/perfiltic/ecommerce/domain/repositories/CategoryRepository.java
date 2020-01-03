@@ -9,7 +9,7 @@ public interface CategoryRepository {
 	
 	public Category getCategoryById(Long idCategory);
 	
-	public Page<Category> getCategoriesByCategory(Long idCategory, Pageable pageable);
+	public Page<Category> getCategoriesBySuperCategory(Long idCategory, Pageable pageable);
 	
 	public Category saveCategory(Category category);
 	
