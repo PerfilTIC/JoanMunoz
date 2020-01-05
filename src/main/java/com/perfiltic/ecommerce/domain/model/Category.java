@@ -28,7 +28,7 @@ public class Category {
 	@NotNull
 	private String name;
 	
-	@NotNull
+	@Column(name = "super_category")
 	private Long superCategory;
 	
 	private String picture;

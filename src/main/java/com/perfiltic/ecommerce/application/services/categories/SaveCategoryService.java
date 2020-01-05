@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.perfiltic.ecommerce.domain.model.Category;
 
-public interface CreateCategoryService {
+public interface SaveCategoryService {
 
-	public Category createCategory(Category category) throws IOException;
+	public Category saveCategory(Category category) throws IOException;
 }
