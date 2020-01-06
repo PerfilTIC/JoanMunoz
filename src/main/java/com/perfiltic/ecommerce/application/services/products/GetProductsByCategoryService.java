@@ -5,7 +5,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.perfiltic.ecommerce.domain.model.Product;
 
-public interface GetProductsByCategory {
+public interface GetProductsByCategoryService {
 
 	public Page<Product> getProductsByCategory(Long idCategory, Pageable pageable);
 }

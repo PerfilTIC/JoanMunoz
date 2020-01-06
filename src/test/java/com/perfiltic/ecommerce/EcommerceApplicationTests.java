@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.io.UnsupportedEncodingException;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterAll;
@@ -26,6 +24,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.perfiltic.ecommerce.application.services.implementations.ImagesService;
 import com.perfiltic.ecommerce.domain.model.Category;
+import com.perfiltic.ecommerce.domain.model.Product;
 import com.perfiltic.ecommerce.infrastructure.controllers.EcommerceController;
 import com.perfiltic.ecommerce.infrastructure.daos.CategoryRepositoryDao;
 import com.perfiltic.ecommerce.infrastructure.daos.ProductRepositoryDao;
@@ -150,7 +149,7 @@ class EcommerceApplicationTests {
 	}
 	
 	@Test
-	public void deleteCategoryTest() throws UnsupportedEncodingException, Exception {
+	public void deleteCategoryTest() throws Exception {
 		// Arrange
 		long amountBefore;
 		long amountAfter;
@@ -162,6 +161,113 @@ class EcommerceApplicationTests {
 		
 		// Assert
 		assertTrue(amountAfter == amountBefore - 1);
+	}
+	
+	@Test
+	public void deleteCategoryNoRemovableTest() throws Exception {
+		// Arrange
+		long amountBefore;
+		long amountAfter;
+		
+		// Act	
+		amountBefore = categoryRepositoryDao.count();	
+		mockMvc.perform( delete(LOCALHOST_API + EcommerceController.URL_DELETE_CATEGORY, 2) )
+				.andExpect(status().isBadRequest());
+		amountAfter = categoryRepositoryDao.count();
+		
+		// Assert
+		assertTrue(amountAfter == amountBefore);
+	}
+
+	@Test
+	public void getProductTest() throws Exception {
+		// Arrange
+		int idProduct = 1;
+		String expectedName = "Drill";
+
+		// Act
+		Product product = objectMapper.readValue( mockMvc.perform( get(LOCALHOST_API + EcommerceController.URL_GET_PRODUCT, idProduct) )
+								.andExpect(status().isOk()).andReturn().getResponse().getContentAsString(), Product.class);
+		// Assert
+		assertEquals(expectedName, product.getName());
+	}
+	
+	@Test
+	public void getProductsByCategoryTest() throws Exception {
+		// Arrange
+		String expectedName = "Drill";
+		
+		// Act
+		JSONObject jsonObject = new JSONObject(mockMvc.perform( get(LOCALHOST_API + EcommerceController.URL_PRODUCTS, 4, 0) )
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+
+		JSONArray jsonArray = jsonObject.getJSONArray("content");
+		Product product =  objectMapper.readValue(jsonArray.get(0).toString(), Product.class);
+		
+		// Assert
+		assertEquals(expectedName, product.getName());
+	}
+	
+	@Test
+	public void deleteProductTest() throws Exception {
+		// Arrange
+		long amountBefore;
+		long amountAfter;
+		
+		// Act	
+		amountBefore = productRepositoryDato.count();	
+		mockMvc.perform( delete(LOCALHOST_API + EcommerceController.URL_DELETE_PRODUCT, 2) ).andExpect(status().isOk());
+		amountAfter = productRepositoryDato.count();
+		
+		// Assert
+		assertTrue(amountAfter == amountBefore - 1);
+	}
+	
+	@Test
+	public void saveProductTest() throws Exception {
+		// Arrange
+		String fileName1 = "imageName1.jpg";
+		String fileName2 = "imageName2.jpg";
+		String fileName3 = "imageName3.jpg";
+		
+		MockMultipartFile image1 = new MockMultipartFile("images", fileName1, "image/jpg", fileName1.getBytes());
+		MockMultipartFile image2 = new MockMultipartFile("images", fileName2, "image/jpg", fileName2.getBytes());
+		MockMultipartFile image3 = new MockMultipartFile("images", fileName3, "image/jpg", fileName3.getBytes());
+		
+		String product = "{\"idCategory\": 3,\"name\": \"Sofa\",\"description\": \"Basic sofa\","
+				+ "\"weight\": 10.0,\"price\": 124.0}";
+		
+		// Act
+		String response = mockMvc.perform(MockMvcRequestBuilders.multipart(LOCALHOST_API + EcommerceController.URL_SAVE_PRODUCT)
+				.file(image1).file(image2).file(image3).param("product", product)).andExpect(status().isOk())
+				.andReturn().getResponse().getContentAsString();
+		
+		Product savedProduct = objectMapper.readValue(response, Product.class);
+		imagesService.deleteImage(savedProduct.getPicture1());
+		imagesService.deleteImage(savedProduct.getPicture2());
+		imagesService.deleteImage(savedProduct.getPicture3());
+		
+		// Assert
+		assertTrue(savedProduct.getPicture2().contains(fileName2) && savedProduct.getName().equals("Sofa"));
+	}
+	
+	@Test
+	public void saveProductNoLastCategoryTest() throws Exception {
+		// Arrange
+		long amountBefore;
+		long amountAfter;
+		
+		String product = "{\"idCategory\": 2,\"name\": \"Sofa\",\"description\": \"Basic sofa\","
+				+ "\"weight\": 10.0,\"price\": 124.0}";
+		
+		// Act
+		amountBefore = productRepositoryDato.count();			
+		mockMvc.perform(MockMvcRequestBuilders.multipart(LOCALHOST_API + EcommerceController.URL_SAVE_PRODUCT)
+				.param("product", product)).andExpect(status().isBadRequest());
+		amountAfter = productRepositoryDato.count();	
+		
+		// Assert
+		assertTrue(amountBefore == amountAfter);
 	}
 
 }

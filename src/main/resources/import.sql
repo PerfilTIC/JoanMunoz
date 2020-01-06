@@ -3,4 +3,5 @@ INSERT INTO category (id_category,name,super_category,picture) VALUES (2,'Home',
 INSERT INTO category (id_category,name,super_category,picture) VALUES (3,'Furnitures', 2, null);
 INSERT INTO category (id_category,name,super_category,picture) VALUES (4,'Tools', 2, 'Herramienta.jpg');
 INSERT INTO category (id_category,name,super_category,picture) VALUES (5,'Cellphones', null, null);
-INSERT INTO product (id_product,id_category,name,description,weight,price,picture1,picture2,picture3) VALUES (1, 4,'Drill','et',8,7,'drill1.PNG','drill2.PNG','drill3.PNG');
+INSERT INTO product (id_product,id_category,name,description,weight,price,picture1,picture2,picture3) VALUES (1, 4,'Drill','Mulitfunctional drill',8,7,'drill1.PNG','drill2.PNG','drill3.PNG');
+INSERT INTO product (id_product,id_category,name,description,weight,price,picture1,picture2,picture3) VALUES (2, 4,'Hammer','Basic hammer',3,4, null, null, null);

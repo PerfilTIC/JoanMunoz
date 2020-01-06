@@ -40,12 +40,9 @@ public class Product {
 	@NotNull
 	private double price;
 	
-	@NotNull
 	private String picture1;
 	
-	@NotNull
 	private String picture2;
 	
-	@NotNull
 	private String picture3;
 }

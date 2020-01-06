@@ -11,7 +11,7 @@ import com.perfiltic.ecommerce.application.services.categories.GetSuperCategorie
 import com.perfiltic.ecommerce.application.services.categories.SaveCategoryService;
 import com.perfiltic.ecommerce.application.services.products.DeleteProductService;
 import com.perfiltic.ecommerce.application.services.products.GetProductService;
-import com.perfiltic.ecommerce.application.services.products.GetProductsByCategory;
+import com.perfiltic.ecommerce.application.services.products.GetProductsByCategoryService;
 import com.perfiltic.ecommerce.application.services.products.SaveProductService;
 import com.perfiltic.ecommerce.domain.exceptions.CategoryIsNotLastLevelException;
 import com.perfiltic.ecommerce.domain.exceptions.CategoryNotRemovableException;
@@ -23,7 +23,7 @@ import com.perfiltic.ecommerce.domain.repositories.ProductRepository;
 @Service
 public class EcommerceService
 		implements GetCategoryService, SaveCategoryService, DeleteCategoryService, GetSubCategoriesService,
-		GetSuperCategoriesService, SaveProductService, GetProductService, DeleteProductService, GetProductsByCategory {
+		GetSuperCategoriesService, GetProductService, GetProductsByCategoryService, DeleteProductService, SaveProductService {
 
 	public static final String CATEGORY_NO_REMOVABLE = "The category is not removable because it has some products or subcategories.";
 	public static final String CATEGORY_IS_NOT_FINAL = "The category cannot have products because it has subcategories.";
@@ -66,13 +66,18 @@ public class EcommerceService
 	}
 
 	@Override
-	public void deleteProduct(Long idProduct) {
-		productRepository.deleteProduct(idProduct);
+	public Product getProductById(Long idProduct) {
+		return productRepository.getProductById(idProduct);
 	}
 
 	@Override
-	public Product getProductById(Long idProduct) {
-		return productRepository.getProductById(idProduct);
+	public Page<Product> getProductsByCategory(Long idCategory, Pageable pageable) {
+		return productRepository.getProductsByCategory(idCategory, pageable);
+	}
+
+	@Override
+	public void deleteProduct(Long idProduct) {
+		productRepository.deleteProduct(idProduct);
 	}
 
 	@Override
@@ -83,11 +88,6 @@ public class EcommerceService
 			return productRepository.saveProduct(product);
 		else
 			throw new CategoryIsNotLastLevelException(CATEGORY_IS_NOT_FINAL);
-	}
-
-	@Override
-	public Page<Product> getProductsByCategory(Long idCategory, Pageable pageable) {
-		return productRepository.getProductsByCategory(idCategory, pageable);
 	}
 
 }
