@@ -158,19 +158,15 @@ public class EcommerceController {
 		Map<String, Object> response = new HashMap<>();
 		Category category = getCategoryService.getCategory(idCategory);
 		
-		if (category == null) {
-			response.put(MESSAGE, String.format(NOT_REGISTERED, "Category", idCategory));
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-		}
-		
 		try {
-			deleteImageService.deleteImage(category.getPicture());
 			deleteCategoryService.deleteCategory(idCategory);
+			deleteImageService.deleteImage(category.getPicture());
 			response.put(MESSAGE, "The category has been removed successfully");
 			return ResponseEntity.ok(response);
 			
 		} catch (CategoryNotRemovableException exception) {
-			response.put(MESSAGE, exception.getMessage());
+			response.put(MESSAGE, "The category is not removable");
+			response.put(ERROR, exception.getMessage());
 			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			
 		} catch (DataAccessException exception) {
@@ -209,16 +205,11 @@ public class EcommerceController {
 		Map<String, Object> response = new HashMap<>();
 		Product product = getProductService.getProductById(idProduct);
 
-		if (product == null) {
-			response.put(MESSAGE, String.format(NOT_REGISTERED, "Product", idProduct));
-			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-		}
-
 		try {
+			deleteProductService.deleteProduct(idProduct);
 			deleteImageService.deleteImage(product.getPicture1());
 			deleteImageService.deleteImage(product.getPicture2());
 			deleteImageService.deleteImage(product.getPicture3());
-			deleteProductService.deleteProduct(idProduct);
 			
 			response.put(MESSAGE, "The product has been removed successfully");
 			return ResponseEntity.ok(response);
