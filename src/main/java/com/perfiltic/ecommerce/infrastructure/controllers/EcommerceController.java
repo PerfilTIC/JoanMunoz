@@ -233,13 +233,24 @@ public class EcommerceController {
 		
 		try {
 			Product product = objectMapper.readValue(productJson, Product.class);
-
+			
 			if(images != null && !images.isEmpty()) {
 				List<String> pictures = saveProductPictures(images);
 				
-				product.setPicture1(pictures.get(0));
-				product.setPicture2(pictures.get(1));
-				product.setPicture3(pictures.get(2));
+				switch(pictures.size()) {
+					case 3:
+						product.setPicture1(pictures.get(0));
+						product.setPicture2(pictures.get(1));
+						product.setPicture3(pictures.get(2));
+						break;
+					case 2:
+						product.setPicture1(pictures.get(0));
+						product.setPicture2(pictures.get(1));
+						break;
+					default:
+						product.setPicture1(pictures.get(0));
+						break;
+				}
 			}
 
 			return ResponseEntity.ok(saveProductService.saveProduct(product));
