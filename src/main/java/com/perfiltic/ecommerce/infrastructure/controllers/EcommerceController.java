@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +44,7 @@ import com.perfiltic.ecommerce.domain.exceptions.CategoryIsNotLastLevelException
 import com.perfiltic.ecommerce.domain.exceptions.CategoryNotRemovableException;
 import com.perfiltic.ecommerce.domain.model.Category;
 import com.perfiltic.ecommerce.domain.model.Product;
+import com.perfiltic.ecommerce.infrastructure.dtos.ProductDto;
 
 @RestController
 @RequestMapping("/api")
@@ -58,6 +61,7 @@ public class EcommerceController {
 	public static final String URL_PRODUCTS = "/products/{idCategory}/{page}";
 	public static final String URL_DELETE_PRODUCT = "/product/delete/{idProduct}";
 	public static final String URL_SAVE_PRODUCT = "/products/save";
+	public static final String URL_UPDATE_PRODUCT = "/products/update";
 
 	public static final String URL_GET_IMAGE = "/image/{nameImage:.+}";
 
@@ -282,6 +286,24 @@ public class EcommerceController {
 			namesImages.add( saveImageService.saveImage(image) );
 		
 		return namesImages;
+	}
+	
+	@PutMapping(URL_UPDATE_PRODUCT)
+	public ResponseEntity<Object> updateProduct(@RequestBody ProductDto productDto) {
+		Map<String, Object> response = new HashMap<>();
+		Product savedProduct = getProductService.getProductById(productDto.getIdProduct());
+		
+		if(savedProduct == null) {
+			response.put(MESSAGE, String.format(NOT_REGISTERED, "Product", productDto.getIdProduct()));
+			return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+		}
+		
+		savedProduct.setName(productDto.getName());
+		savedProduct.setDescription(productDto.getDescription());
+		savedProduct.setWeight(productDto.getWeight());
+		savedProduct.setPrice(productDto.getPrice());
+		
+		return ResponseEntity.ok( saveProductService.saveProduct(savedProduct) );
 	}
 
 	@GetMapping(URL_GET_IMAGE)
